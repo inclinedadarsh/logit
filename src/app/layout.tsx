@@ -1,3 +1,11 @@
+import {
+	ClerkProvider,
+	SignInButton,
+	SignUpButton,
+	SignedIn,
+	SignedOut,
+	UserButton,
+} from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
@@ -23,8 +31,21 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className="font-body antialiased">{children}</body>
-		</html>
+		<ClerkProvider>
+			<html lang="en">
+				<body className="font-body antialiased">
+					<header className="flex justify-end p-4 gap-4">
+						<SignedOut>
+							<SignInButton mode="modal" />
+							<SignUpButton mode="modal" />
+						</SignedOut>
+						<SignedIn>
+							<UserButton />
+						</SignedIn>
+					</header>
+					{children}
+				</body>
+			</html>
+		</ClerkProvider>
 	);
 }
