@@ -40,6 +40,9 @@ export function Navbar() {
 				</SignedOut>
 
 				<SignedIn>
+					<Link href="/logs/new">
+						<Button variant="outline">Create a log</Button>
+					</Link>
 					<UserButton />
 				</SignedIn>
 			</div>
