@@ -1,14 +1,8 @@
-import {
-	ClerkProvider,
-	SignInButton,
-	SignUpButton,
-	SignedIn,
-	SignedOut,
-	UserButton,
-} from "@clerk/nextjs";
+import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
 import { Inter, Inter_Tight } from "next/font/google";
 import "./globals.css";
+import { Navbar } from "@/components/Navbar";
 
 const inter = Inter({
 	variable: "--font-inter",
@@ -34,15 +28,7 @@ export default function RootLayout({
 		<ClerkProvider>
 			<html lang="en">
 				<body className="font-body antialiased">
-					<header className="flex justify-end p-4 gap-4">
-						<SignedOut>
-							<SignInButton mode="modal" />
-							<SignUpButton mode="modal" />
-						</SignedOut>
-						<SignedIn>
-							<UserButton />
-						</SignedIn>
-					</header>
+					<Navbar />
 					{children}
 				</body>
 			</html>
