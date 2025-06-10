@@ -1,18 +1,14 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Metadata } from "next";
-import { Inter, Inter_Tight } from "next/font/google";
+import { Charis_SIL } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 import { Toaster } from "@/components/ui/sonner";
 
-const inter = Inter({
-	variable: "--font-inter",
+const charis = Charis_SIL({
+	variable: "--font-charis",
 	subsets: ["latin"],
-});
-
-const interTight = Inter_Tight({
-	variable: "--font-inter-tight",
-	subsets: ["latin"],
+	weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
