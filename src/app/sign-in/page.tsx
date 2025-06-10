@@ -1,7 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { SignInButton, SignUpButton } from "@clerk/nextjs";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
 
-export default function SignInPage() {
+export default async function SignInPage() {
+	const session = await auth();
+
+	if (session?.userId) {
+		redirect("/logs/new");
+	}
+
 	return (
 		<div className="container mx-auto py-16">
 			<div className="text-center space-y-8">
