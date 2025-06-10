@@ -1,7 +1,13 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import Calendar24 from "./calendar-24";
 
 interface CreateLogFormProps {
 	onSuccess?: () => void;
@@ -11,18 +17,19 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [formData, setFormData] = useState({
+		title: "",
+		description: "",
+		log_datetime: "",
+		tags: "",
+	});
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setError(null);
 
-		const formData = new FormData(e.currentTarget);
-		const title = formData.get("title") as string;
-		const description = formData.get("description") as string;
-		const log_datetime = formData.get("log_datetime") as string;
-		const tagsInput = formData.get("tags") as string;
-		const tags = tagsInput
+		const tags = formData.tags
 			.split(",")
 			.map(tag => tag.trim())
 			.filter(Boolean);
@@ -34,9 +41,9 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					title,
-					description,
-					log_datetime,
+					title: formData.title,
+					description: formData.description,
+					log_datetime: formData.log_datetime,
 					tags,
 				}),
 			});
@@ -45,6 +52,14 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 				const data = await response.json();
 				throw new Error(data.error || "Failed to create log");
 			}
+
+			// Clear form
+			setFormData({
+				title: "",
+				description: "",
+				log_datetime: "",
+				tags: "",
+			});
 
 			if (onSuccess) {
 				onSuccess();
@@ -59,83 +74,90 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 		}
 	};
 
+	const handleInputChange = (
+		e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+	) => {
+		const { name, value } = e.target;
+		setFormData(prev => ({
+			...prev,
+			[name]: value,
+		}));
+	};
+
+	const handleDateTimeChange = (date: Date | undefined, time: string) => {
+		if (date && time) {
+			const [hours, minutes] = time.split(":");
+			date.setHours(Number.parseInt(hours, 10));
+			date.setMinutes(Number.parseInt(minutes, 10));
+			setFormData(prev => ({
+				...prev,
+				log_datetime: date.toISOString(),
+			}));
+		}
+	};
+
 	return (
 		<form
 			onSubmit={handleSubmit}
-			className="space-y-4 max-w-2xl mx-auto p-4"
+			className="space-y-6 max-w-2xl mx-auto p-4"
 		>
-			<div>
-				<label
-					htmlFor="title"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Title
-				</label>
-				<input
-					type="text"
+			<div className="space-y-2">
+				<Label htmlFor="title">Title</Label>
+				<Input
 					id="title"
 					name="title"
+					value={formData.title}
+					onChange={handleInputChange}
 					required
-					className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 				/>
 			</div>
 
-			<div>
-				<label
-					htmlFor="description"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Description
-				</label>
-				<textarea
+			<div className="space-y-2">
+				<Label htmlFor="description">Description</Label>
+				<Textarea
 					id="description"
 					name="description"
+					value={formData.description}
+					onChange={handleInputChange}
 					rows={4}
-					className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 				/>
 			</div>
 
-			<div>
-				<label
-					htmlFor="log_datetime"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Date and Time
-				</label>
-				<input
-					type="datetime-local"
-					id="log_datetime"
-					name="log_datetime"
+			<div className="space-y-2">
+				<Calendar24
+					onDateTimeChange={handleDateTimeChange}
+					value={
+						formData.log_datetime
+							? new Date(formData.log_datetime)
+							: undefined
+					}
 					required
-					className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 				/>
 			</div>
 
-			<div>
-				<label
-					htmlFor="tags"
-					className="block text-sm font-medium text-gray-700"
-				>
-					Tags (comma-separated)
-				</label>
-				<input
-					type="text"
+			<div className="space-y-2">
+				<Label htmlFor="tags">Tags (comma-separated)</Label>
+				<Input
 					id="tags"
 					name="tags"
+					value={formData.tags}
+					onChange={handleInputChange}
 					placeholder="work, personal, health"
-					className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
 				/>
 			</div>
 
-			{error && <div className="text-red-600 text-sm">{error}</div>}
+			{error && <div className="text-destructive text-sm">{error}</div>}
 
-			<button
-				type="submit"
-				disabled={isSubmitting}
-				className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
-			>
-				{isSubmitting ? "Creating..." : "Create Log"}
-			</button>
+			<Button type="submit" disabled={isSubmitting} className="w-full">
+				{isSubmitting ? (
+					<>
+						<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+						Creating...
+					</>
+				) : (
+					"Create Log"
+				)}
+			</Button>
 		</form>
 	);
 }
