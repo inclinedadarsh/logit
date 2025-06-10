@@ -7,6 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { toast } from "sonner";
 import Calendar24 from "./calendar-24";
 
 interface CreateLogFormProps {
@@ -52,6 +53,10 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 				const data = await response.json();
 				throw new Error(data.error || "Failed to create log");
 			}
+
+			toast.success("Log created successfully", {
+				description: "You can see your log on your profile page.",
+			});
 
 			// Clear form
 			setFormData({
