@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Loader2 } from "lucide-react";
+import { Loader2, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -18,22 +18,18 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 	const router = useRouter();
 	const [isSubmitting, setIsSubmitting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [tags, setTags] = useState<string[]>([]);
+	const [tagInput, setTagInput] = useState("");
 	const [formData, setFormData] = useState({
 		title: "",
 		description: "",
 		log_datetime: "",
-		tags: "",
 	});
 
 	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
 		setIsSubmitting(true);
 		setError(null);
-
-		const tags = formData.tags
-			.split(",")
-			.map(tag => tag.trim())
-			.filter(Boolean);
 
 		try {
 			const response = await fetch("/api/logs", {
@@ -63,8 +59,9 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 				title: "",
 				description: "",
 				log_datetime: "",
-				tags: "",
 			});
+			setTags([]);
+			setTagInput("");
 
 			if (onSuccess) {
 				onSuccess();
@@ -87,6 +84,24 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 			...prev,
 			[name]: value,
 		}));
+	};
+
+	const handleTagInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const value = e.target.value;
+		setTagInput(value);
+
+		// Check if the last character is a comma
+		if (value.endsWith(",")) {
+			const newTag = value.slice(0, -1).trim();
+			if (newTag && !tags.includes(newTag)) {
+				setTags(prev => [...prev, newTag]);
+			}
+			setTagInput("");
+		}
+	};
+
+	const removeTag = (tagToRemove: string) => {
+		setTags(prev => prev.filter(tag => tag !== tagToRemove));
 	};
 
 	const handleDateTimeChange = (date: Date | undefined, time: string) => {
@@ -138,14 +153,32 @@ export default function CreateLogForm({ onSuccess }: CreateLogFormProps) {
 			</div>
 
 			<div className="space-y-2">
-				<Label htmlFor="tags">Tags (comma-separated)</Label>
+				<Label htmlFor="tags">Tags</Label>
 				<Input
 					id="tags"
-					name="tags"
-					value={formData.tags}
-					onChange={handleInputChange}
-					placeholder="work, personal, health"
+					value={tagInput}
+					onChange={handleTagInputChange}
+					placeholder="Type and press comma to add tags"
 				/>
+				{tags.length > 0 && (
+					<div className="flex flex-wrap gap-2 mt-2">
+						{tags.map(tag => (
+							<div
+								key={tag}
+								className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-sm"
+							>
+								<span>{tag}</span>
+								<button
+									type="button"
+									onClick={() => removeTag(tag)}
+									className="hover:text-destructive"
+								>
+									<X className="h-3 w-3" />
+								</button>
+							</div>
+						))}
+					</div>
+				)}
 			</div>
 
 			{error && <div className="text-destructive text-sm">{error}</div>}
