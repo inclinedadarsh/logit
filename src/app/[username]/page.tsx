@@ -2,19 +2,22 @@ import { supabase } from "@/lib/supabase";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 
-interface UserLogsPageProps {
-	params: {
-		username: string;
-	};
-}
-
 export async function generateMetadata({
 	params,
-}: UserLogsPageProps): Promise<Metadata> {
+}: {
+	params: Promise<{ username: string }>;
+}): Promise<Metadata> {
+	const { username } = await params;
+	if (!username) {
+		return {
+			title: "User Not Found",
+		};
+	}
+
 	const { data: user } = await supabase
 		.from("users")
 		.select("username, first_name, last_name")
-		.eq("username", params.username)
+		.eq("username", username)
 		.single();
 
 	if (!user) {
@@ -33,12 +36,17 @@ export async function generateMetadata({
 	};
 }
 
-export default async function UserLogsPage({ params }: UserLogsPageProps) {
+export default async function UserLogsPage({
+	params,
+}: {
+	params: Promise<{ username: string }>;
+}) {
+	const { username } = await params;
 	// First, get the user from the username
 	const { data: user, error: userError } = await supabase
 		.from("users")
 		.select("id, username, first_name, last_name")
-		.eq("username", params.username)
+		.eq("username", username)
 		.single();
 
 	if (userError || !user) {
