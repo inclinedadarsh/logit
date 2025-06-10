@@ -12,7 +12,7 @@ import Link from "next/link";
 
 export function Navbar() {
 	return (
-		<nav className="flex items-center justify-between p-4 border-b">
+		<nav className="flex items-center justify-between py-4 border-b">
 			<Link href="/" className="text-2xl font-bold">
 				Log It!
 			</Link>

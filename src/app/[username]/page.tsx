@@ -70,51 +70,43 @@ export default async function UserLogsPage({
 			: user.username;
 
 	return (
-		<div className="container mx-auto py-8 px-4">
-			<div className="max-w-4xl mx-auto">
-				<h1 className="text-3xl font-bold mb-8">
-					{displayName}'s Logs
-				</h1>
+		<div className="container mx-auto py-8">
+			<h1 className="text-3xl font-bold mb-8">{displayName}'s Logs</h1>
 
-				{logs.length === 0 ? (
-					<p className="text-gray-600 text-center py-8">
-						No logs found.
-					</p>
-				) : (
-					<div className="space-y-6">
-						{logs.map(log => (
-							<article
-								key={log.id}
-								className="bg-white rounded-lg shadow p-6 border border-gray-200"
-							>
-								<h2 className="text-xl font-semibold mb-2">
-									{log.title}
-								</h2>
-								{log.description && (
-									<p className="text-gray-600 mb-4">
-										{log.description}
-									</p>
-								)}
-								<div className="flex flex-wrap gap-2 mb-4">
-									{log.tags?.map((tag: string) => (
-										<span
-											key={tag}
-											className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full"
-										>
-											{tag}
-										</span>
-									))}
-								</div>
-								<time className="text-sm text-gray-500">
-									{new Date(
-										log.log_datetime,
-									).toLocaleString()}
-								</time>
-							</article>
-						))}
-					</div>
-				)}
-			</div>
+			{logs.length === 0 ? (
+				<p className="text-gray-600 text-center py-8">No logs found.</p>
+			) : (
+				<div className="space-y-6">
+					{logs.map(log => (
+						<article
+							key={log.id}
+							className="bg-white rounded-lg shadow p-6 border border-gray-200"
+						>
+							<h2 className="text-xl font-semibold mb-2">
+								{log.title}
+							</h2>
+							{log.description && (
+								<p className="text-gray-600 mb-4">
+									{log.description}
+								</p>
+							)}
+							<div className="flex flex-wrap gap-2 mb-4">
+								{log.tags?.map((tag: string) => (
+									<span
+										key={tag}
+										className="bg-gray-100 text-gray-800 text-sm px-3 py-1 rounded-full"
+									>
+										{tag}
+									</span>
+								))}
+							</div>
+							<time className="text-sm text-gray-500">
+								{new Date(log.log_datetime).toLocaleString()}
+							</time>
+						</article>
+					))}
+				</div>
+			)}
 		</div>
 	);
 }

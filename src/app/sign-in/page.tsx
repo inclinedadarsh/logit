@@ -3,8 +3,8 @@ import { SignInButton, SignUpButton } from "@clerk/nextjs";
 
 export default function SignInPage() {
 	return (
-		<div className="container mx-auto py-16 px-4">
-			<div className="max-w-md mx-auto text-center space-y-8">
+		<div className="container mx-auto py-16">
+			<div className="text-center space-y-8">
 				<h1 className="text-3xl font-bold">Welcome to Log It!</h1>
 				<p className="text-gray-600">
 					Please sign in or register to start creating your work logs.

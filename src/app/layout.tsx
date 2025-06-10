@@ -28,7 +28,7 @@ export default function RootLayout({
 	return (
 		<ClerkProvider>
 			<html lang="en">
-				<body className="font-body antialiased">
+				<body className="font-body antialiased max-w-xl px-5 mx-auto">
 					<Navbar />
 					{children}
 					<Toaster richColors theme="light" />
